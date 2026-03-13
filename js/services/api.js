@@ -12,12 +12,23 @@ const api = {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email, password })
                 });
-                const data = await res.json();
-                if (!res.ok) throw new Error(data.msg || 'Login failed');
-                return data;
+                
+                const contentType = res.headers.get('content-type');
+                if (contentType && contentType.includes('application/json')) {
+                    const data = await res.json();
+                    if (!res.ok) throw new Error(data.msg || 'Login failed');
+                    return data;
+                } else {
+                    const text = await res.text();
+                    console.error('Non-JSON response received:', text);
+                    // Check if it's a specific internal error or just a 404/500
+                    if (res.status === 404) throw new Error('Backend route not found. Check if the Render link is correct.');
+                    if (res.status === 503) throw new Error('Backend is starting up (Cold Start). Please wait 30 seconds and try again.');
+                    throw new Error(`Server returned non-JSON response (${res.status}). Check console for details.`);
+                }
             } catch (err) {
                 if (err.name === 'TypeError' && err.message.includes('fetch')) {
-                    throw new Error('Server unreachable. Please ensure the backend is running (run npm run server)');
+                    throw new Error('Server unreachable. Please ensure the backend is running on Render.');
                 }
                 throw err;
             }
