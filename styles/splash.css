@@ -1,0 +1,158 @@
+/* ============================================
+   SPLASH SCREEN
+   ============================================ */
+
+.splash-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: var(--bg-primary);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    overflow: hidden;
+}
+
+.splash-content {
+    text-align: center;
+    width: 100%;
+}
+
+.splash-title {
+    font-size: 6rem;
+    /* Increased size significantly */
+    font-weight: 800;
+    margin-bottom: var(--spacing-md);
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    font-family: var(--font-primary);
+    line-height: 1.1;
+}
+
+.letter {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(50px) scale(0.5);
+    animation: letterReveal 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    background: var(--accent-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 0 15px rgba(99, 102, 241, 0.5));
+}
+
+.letter:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.letter:nth-child(2) {
+    animation-delay: 0.15s;
+}
+
+.letter:nth-child(3) {
+    animation-delay: 0.2s;
+}
+
+.letter:nth-child(4) {
+    animation-delay: 0.25s;
+}
+
+.letter:nth-child(5) {
+    animation-delay: 0.3s;
+}
+
+.letter:nth-child(6) {
+    animation-delay: 0.35s;
+}
+
+.letter:nth-child(7) {
+    animation-delay: 0.4s;
+}
+
+.letter:nth-child(8) {
+    animation-delay: 0.45s;
+}
+
+.letter:nth-child(9) {
+    animation-delay: 0.5s;
+}
+
+.letter:nth-child(10) {
+    animation-delay: 0.55s;
+}
+
+.letter:nth-child(11) {
+    animation-delay: 0.6s;
+}
+
+.letter:nth-child(12) {
+    animation-delay: 0.65s;
+}
+
+.letter:nth-child(13) {
+    animation-delay: 0.7s;
+}
+
+.letter:nth-child(14) {
+    animation-delay: 0.75s;
+}
+
+.letter:nth-child(15) {
+    animation-delay: 0.8s;
+}
+
+.splash-subtitle {
+    color: var(--text-secondary);
+    font-size: 1.5rem;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.8s ease-out forwards;
+    animation-delay: 1.5s;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    font-weight: 500;
+}
+
+@keyframes letterReveal {
+    0% {
+        opacity: 0;
+        transform: translateY(50px) scale(0.5);
+    }
+
+    60% {
+        transform: translateY(-10px) scale(1.05);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.splash-screen.fade-out {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s ease-out, visibility 0.5s;
+}
+
+@media (max-width: 768px) {
+    .splash-title {
+        font-size: 3.5rem;
+    }
+
+    .splash-subtitle {
+        font-size: 1rem;
+        letter-spacing: 2px;
+    }
+}

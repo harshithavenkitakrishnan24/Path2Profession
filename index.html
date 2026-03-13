@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume - Path2profession</title>
+    <meta name="description"
+        content="Build ATS-friendly resumes, get AI Chatbot feedback, and ace your interviews with Path2profession">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&family=Montserrat:wght@400;500;600;700&family=Lato:wght@300;400;700&display=swap"
+        rel="stylesheet">
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="stylesheet" href="styles/index.css">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+
+<body>
+    <!-- Background Blobs for Glassmorphism -->
+    <div class="bg-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+    <!-- Splash Screen -->
+    <div id="splashScreen" class="splash-screen">
+        <div class="splash-content">
+            <h1 class="splash-title">
+                <span class="letter">P</span>
+                <span class="letter">a</span>
+                <span class="letter">t</span>
+                <span class="letter">h</span>
+                <span class="letter">2</span>
+                <span class="letter">P</span>
+                <span class="letter">r</span>
+                <span class="letter">o</span>
+                <span class="letter">f</span>
+                <span class="letter">e</span>
+                <span class="letter">s</span>
+                <span class="letter">s</span>
+                <span class="letter">i</span>
+                <span class="letter">o</span>
+                <span class="letter">n</span>
+            </h1>
+            <p class="splash-subtitle">Your Career Journey Starts Here</p>
+        </div>
+    </div>
+
+    <div id="app" style="display: none;">
+        <!-- Navigation -->
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="nav-brand">
+                    <img src="logo.png" alt="Path2Professional Logo" class="logo-img">
+                </div>
+                <ul class="nav-menu" id="navMenu">
+                    <li><a href="#" class="nav-link active" data-page="home">Home</a></li>
+                    <li><a href="#" class="nav-link" data-page="templates">Resume Builder</a></li>
+                    <li><a href="#" class="nav-link" data-page="jobs">Smart Apply</a></li>
+                    <li><a href="#" class="nav-link" data-page="chatbot">AI Chatbot</a></li>
+
+
+                    <!-- Hidden links for navigation -->
+                    <li style="display: none;"><a href="#" class="nav-link" data-page="resume">Resume Editor</a></li>
+                    <li style="display: none;"><a href="#" class="nav-link" data-page="gallery">Template Gallery</a>
+                    </li>
+                    <li><a href="#" class="nav-link" data-page="help">Help</a></li>
+                </ul>
+                <a href="#" class="login-link" id="loginLink" data-page="login">👤 Login</a>
+                <button class="logout-btn" id="logoutBtn" style="display: none;">🚪 Logout</button>
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+                    <span class="theme-icon">🌙</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main id="mainContent">
+            <!-- Pages will be dynamically loaded here -->
+        </main>
+    </div>
+
+    <!-- Fail-safe Script: Ensure Splash Screen goes away even if app.js fails -->
+    <script>
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const splash = document.getElementById('splashScreen');
+                const app = document.getElementById('app');
+                if (splash && splash.style.display !== 'none') {
+                    console.warn('Splash screen forced closed by fail-safe script');
+                    splash.style.display = 'none';
+                    if (app) {
+                        app.style.display = 'block';
+                        app.style.opacity = '1';
+                    }
+                }
+            }, 4500); // 4.5 seconds absolute max wait
+        });
+    </script>
+
+    <!-- PDF Generation Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <!-- Scripts -->
+    <script src="js/app.js" type="module"></script>
+</body>
+
+</html>
