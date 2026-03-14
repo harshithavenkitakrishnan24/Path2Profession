@@ -254,8 +254,15 @@ router.post('/google', async (req, res) => {
         });
 
     } catch (err) {
-        console.error('Google Auth Error:', err.message);
-        res.status(401).json({ msg: 'Token verification failed' });
+        console.error('Google Auth Security Error:', {
+            message: err.message,
+            stack: err.stack,
+            audienceUsed: GOOGLE_CLIENT_ID
+        });
+        res.status(401).json({
+            message: 'Token verification failed',
+            details: err.message
+        });
     }
 });
 
