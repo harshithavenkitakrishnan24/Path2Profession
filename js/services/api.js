@@ -210,6 +210,14 @@ const api = {
             if (token) options.headers = { 'x-auth-token': token };
             return fetchJSON('/chat', options);
         }
+    },
+
+    // Job Search Services (Real-time API)
+    jobSearch: {
+        search: async (keywords, location, page = 1) => {
+            const params = new URLSearchParams({ keywords, location, page });
+            return fetchJSON(`/jobsearch?${params.toString()}`);
+        }
     }
 };
 

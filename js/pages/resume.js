@@ -1087,8 +1087,9 @@ export class ResumePage {
                 <div class="toolbar-right">
                     <button class="toolbar-btn" id="atsHeatmapBtn" style="background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; margin-right: 10px;">🔍 Scan ATS Heatmap</button>
                     <button class="toolbar-btn magic-btn" id="aiGenerateBtn" style="background: linear-gradient(135deg, #FF6B6B, #FF8E53); color: white; border: none;">✨ AI Generate</button>
+                    <button class="toolbar-btn" id="saveResumeBtn" style="border: 1px solid #10b981; color: #10b981; background: white; margin-right: 10px;">💾 Save Resume</button>
                     <button class="toolbar-btn" id="undoBtn">↶ Undo</button>
-                    <button class="toolbar-btn" id="redoBtn">↷ Redo</button>
+                    <button class="toolbar-btn" id="editResumeBtn" style="display: ${this.isViewMode ? 'flex' : 'none'}; border: 1px solid #6366f1; color: #6366f1; background: white; margin-right: 10px;">✏️ Edit Resume</button>
                     <button class="toolbar-btn primary" id="downloadBtn">⬇ Download PDF</button>
                 </div>
             </div>
@@ -2577,6 +2578,35 @@ export class ResumePage {
         const downloadBtn = this.element.querySelector('#downloadBtn');
         downloadBtn?.addEventListener('click', () => {
             window.print();
+        });
+
+        // Edit Resume
+        const editResumeBtn = this.element.querySelector('#editResumeBtn');
+        editResumeBtn?.addEventListener('click', () => {
+            localStorage.setItem('resumeViewMode', 'false');
+            this.isViewMode = false;
+            
+            // Re-render the entire editor to restore all editable elements and event listeners
+            this.element.innerHTML = this.render().innerHTML;
+            this.attachEventListeners();
+        });
+
+        // Save Resume Manually
+        const saveResumeBtn = this.element.querySelector('#saveResumeBtn');
+        saveResumeBtn?.addEventListener('click', () => {
+            this.saveResumeData();
+            
+            // Visual feedback
+            const originalText = saveResumeBtn.innerHTML;
+            saveResumeBtn.innerHTML = '✅ Saved!';
+            saveResumeBtn.style.background = '#10b981';
+            saveResumeBtn.style.color = 'white';
+            
+            setTimeout(() => {
+                saveResumeBtn.innerHTML = originalText;
+                saveResumeBtn.style.background = 'white';
+                saveResumeBtn.style.color = '#10b981';
+            }, 2000);
         });
 
         // Undo/Redo (Placeholders)

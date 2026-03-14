@@ -20,6 +20,16 @@ app.use((req, res, next) => {
 // Database Connection
 // Connection will happen after app.listen to avoid blocking during startup
 
+// No-cache for JS/CSS so changes are always picked up fresh
+app.use((req, res, next) => {
+    if (req.url.endsWith('.js') || req.url.endsWith('.css')) {
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+    }
+    next();
+});
+
 // Serve Static Files (Frontend)
 app.use(express.static(path.join(__dirname, '/')));
 
@@ -36,12 +46,14 @@ const authRoutes = require('./backend/routes/auth');
 const resumeRoutes = require('./backend/routes/resume');
 const chatRoutes = require('./backend/routes/chat');
 const jobsRoutes = require('./backend/routes/jobs');
+const jobSearchRoutes = require('./backend/routes/jobsearch');
 
 // Use Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/resume', resumeRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/jobs', jobsRoutes);
+app.use('/api/jobsearch', jobSearchRoutes);
 
 // Fallback for SPA (Serve index.html for any other route)
 app.get('*', (req, res) => {

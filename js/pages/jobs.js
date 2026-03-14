@@ -438,8 +438,9 @@ export class JobsPage {
             </div>
 
             <div id="search-view" style="display: none;">
-                <div class="search-container">
-                    <input type="text" class="search-input" placeholder="Search for jobs (e.g. Frontend Developer)..." id="jobSearchInput">
+                <div class="search-container" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <input type="text" class="search-input" style="flex: 2; min-width: 250px;" placeholder="Job Title (e.g. React Developer)..." id="jobSearchInput">
+                    <input type="text" class="search-input" style="flex: 1; min-width: 150px;" placeholder="Location (e.g. Chennai)..." id="locationSearchInput">
                     <button class="search-btn" id="jobSearchBtn">Search Jobs</button>
                 </div>
                 <div class="search-results" id="searchResults">
@@ -555,10 +556,11 @@ export class JobsPage {
             });
         });
 
-        // Search Mock Jobs
+        // Search Real Jobs
         this.element.querySelector('#jobSearchBtn').addEventListener('click', () => {
             const query = this.element.querySelector('#jobSearchInput').value;
-            this.performMockSearch(query);
+            const location = this.element.querySelector('#locationSearchInput').value;
+            this.performJobSearch(query, location);
         });
 
         // Modal Controls
@@ -953,7 +955,7 @@ export class JobsPage {
         container.innerHTML = html;
     }
 
-    performMockSearch(query) {
+    async performJobSearch(query, location = "") {
         const resultsContainer = this.element.querySelector('#searchResults');
 
         if (!query) {
@@ -961,48 +963,95 @@ export class JobsPage {
             return;
         }
 
-        // Mock Data
-        const mockJobs = [
-            { company: 'Tech Corp', position: `${query}`, location: 'Remote', salary: '$100k - $130k' },
-            { company: 'InnovateOne', position: `Senior ${query}`, location: 'New York, NY', salary: '$120k - $150k' },
-            { company: 'StartupX', position: `Junior ${query}`, location: 'San Francisco, CA', salary: '$80k - $100k' },
-            { company: 'WebSolutions', position: `Lead ${query}`, location: 'Austin, TX', salary: '$140k+' },
-            { company: 'DataSystems', position: `${query} Engineer`, location: 'Remote', salary: '$110k' }
-        ];
-
-        resultsContainer.innerHTML = '';
-        mockJobs.forEach(job => {
-            const card = document.createElement('div');
-            card.className = 'job-card';
-            card.innerHTML = `
-                <div class="job-company">${job.company}</div>
-                <div class="job-position">${job.position}</div>
-                <div class="job-meta">
-                    <div class="job-meta-item">📍 ${job.location}</div>
-                    <div class="job-meta-item">💰 ${job.salary}</div>
+        resultsContainer.innerHTML = `
+            <div class="empty-state">
+                <div class="typing-indicator" style="justify-content: center; margin-bottom: 20px;">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
                 </div>
-                <button class="primary-btn" style="padding: 6px 12px; font-size: 0.85rem; margin-top: 12px; width: 100%;">+ Track Application</button>
-            `;
+                Scouring the web for ${query} roles in ${location || 'anywhere'}...
+            </div>
+        `;
 
-            card.querySelector('button').addEventListener('click', (e) => {
-                e.stopPropagation();
-                this.addMockJob(job);
+        try {
+            const response = await api.jobSearch.search(query, location);
+            
+            if (!response.success || !response.data || !response.data.jobs) {
+                throw new Error(response.message || 'No jobs found');
+            }
+
+            const jobs = response.data.jobs;
+
+            if (jobs.length === 0) {
+                resultsContainer.innerHTML = '<div class="empty-state">No jobs found for this search. Try different keywords.</div>';
+                return;
+            }
+
+            resultsContainer.innerHTML = '';
+            jobs.forEach(job => {
+                const card = document.createElement('div');
+                card.className = 'job-card';
+                
+                // Clean description (Jooble returns HTML snippets)
+                const snippet = job.snippet ? job.snippet.replace(/<[^>]*>?/gm, '').substring(0, 150) + '...' : 'No description available.';
+
+                card.innerHTML = `
+                    <div class="job-card-header">
+                        <div class="job-company">${job.company}</div>
+                        <span class="status-badge" style="color: var(--success); font-size: 0.65rem;">LIVE</span>
+                    </div>
+                    <div class="job-position">${job.title}</div>
+                    <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 12px; line-height: 1.4;">
+                        ${snippet}
+                    </div>
+                    <div class="job-footer">
+                        <div class="job-meta-item">📍 ${job.location || 'Remote'}</div>
+                        <div class="job-meta-item">💰 ${job.salary || 'Competitive'}</div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 15px;">
+                        <button class="primary-btn track-btn" style="padding: 6px 12px; font-size: 0.8rem; margin: 0;">+ Track</button>
+                        <a href="${job.link}" target="_blank" class="primary-btn apply-btn" style="padding: 6px 12px; font-size: 0.8rem; margin: 0; background: var(--success); text-decoration: none; text-align: center; display: block;">Apply Now</a>
+                    </div>
+                `;
+
+                card.querySelector('.track-btn').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.addRealJob(job);
+                });
+
+                resultsContainer.appendChild(card);
             });
 
-            resultsContainer.appendChild(card);
-        });
+        } catch (error) {
+            console.error('Search failed:', error);
+            resultsContainer.innerHTML = `<div class="empty-state" style="color: var(--error);">Failed to fetch jobs: ${error.message}</div>`;
+        }
     }
 
-    async addMockJob(job) {
+    async addRealJob(job) {
         try {
             await api.jobs.create({
                 company: job.company,
-                position: job.position,
+                position: job.title,
                 location: job.location,
                 salary: job.salary,
-                status: 'wishlist'
+                status: 'wishlist',
+                jobDescription: job.snippet ? job.snippet.replace(/<[^>]*>?/gm, '') : '',
+                notes: `Source: Jooble. Original link: ${job.link}`
             });
-            alert('Job added to Wishlist!');
+            
+            // Show a small toast or change button state instead of alert
+            const btn = document.activeElement;
+            if (btn && btn.classList.contains('track-btn')) {
+                btn.textContent = '✅ Added';
+                btn.style.background = 'var(--bg-tertiary)';
+                btn.disabled = true;
+            } else {
+                alert('Job added to Wishlist!');
+            }
+            
             this.fetchJobs();
         } catch (error) {
             alert('Error adding job: ' + error.message);
